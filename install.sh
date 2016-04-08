@@ -28,8 +28,8 @@ echo "  4. Configure Upstart to start and stop your new Meteor application bundl
 echo "  5. Deploy your Meteor Application! Or if you're not ready to deploy, show you how to deploy."
 echo "  6. Give you some next steps and commands you can use, as well as some troubleshooting info."
 echo ""
-echo "This script is based on instructions found online. If you're curious what it's doing, follow along at:" +
-echo "  https://www.digitalocean.com/community/tutorials/how-to-deploy-a-meteor-js-application-on-ubuntu-14-04-with-nginx"
+echo "This script is based on instructions found online. If you're curious what it's doing, follow along at:"
+echo "https://www.digitalocean.com/community/tutorials/how-to-deploy-a-meteor-js-application-on-ubuntu-14-04-with-nginx"
 echo ""
 echo "NOTE: For SSL Certificate configuration, the script will look for .pem and .key files with the"
 echo "      same name as your application, and if found it will use those.  If not, you will be"
