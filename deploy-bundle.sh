@@ -36,9 +36,9 @@ echo ""
 start $METEORAPPNAME
 echo ""
 echo "*** Checking that all deployed services are running..."
-status $METEORAPPNAME
 service nginx status
 status mongodb
+status $METEORAPPNAME
 echo ""
 echo "----------------------------------------------------------------------------------------------"
 echo "If everything worked, your app should now be serving requests at https://$METEORSERVERNAME!"

@@ -14,3 +14,14 @@ following three files ahead of time:
 
 If you place these files in the ubuntu-meteor-install directory before running `install.sh`,
 it will automagically configure SSL for you and deploy your app bundle!  If you don't, it'll ask you to go get them.
+
+
+
+# QUICK START -- zero to Meteor app in just a few minutes!
+```
+apt-get install git
+git clone https://github.com/mturley/ubuntu-meteor-install.git
+cd ubuntu-meteor-install
+# Set up your files: yourapp.tar.gz, yourapp.pem, yourapp.key, in the ubuntu-meteor-install directory
+./install.sh
+```
