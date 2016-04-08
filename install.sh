@@ -19,14 +19,14 @@ CWD=$(pwd)
 echo ""
 echo "----- METEOR + MONGODB + NGINX INSTALL SCRIPT -----"
 echo ""
-echo "This script will take your fresh new Ubuntu server and get it ready for a Meteor app deployment!"
+echo "This script will take your fresh new Ubuntu server and get it ready for hosting a Meteor app!"
 echo "It will try to do all of the following, prompting you for any info it needs along the way:"
-echo "  1. Install nginx and configure it for an SSL-enabled Meteor site. You provide the certificate and key files."
-echo "  2. Install and configure a local MongoDB database, or configure the app for with your custom mongodb:// URL."
-echo "  3. Install Node.js and your Meteor application bundle."
-echo "  4. Configure Upstart to start and stop your new Meteor application service automatically."
-echo "  5. Deploy your Meteor Application! Or if you're not ready to deploy, show you how to deploy in the future."
-echo "  6. Provide you with scripts you can use to redeploy your app with future changes."
+echo "  1. Install nginx and configure it for an SSL-enabled Meteor site. You provide the SSL files."
+echo "  2. Install and configure a local MongoDB database, or configure with any mongodb:// URL."
+echo "  3. Install Node.js and all NPM dependencies for your Meteor application bundle."
+echo "  4. Configure Upstart to start and stop your new Meteor application bundle automatically."
+echo "  5. Deploy your Meteor Application! Or if you're not ready to deploy, show you how to deploy."
+echo "  6. Give you some next steps and commands you can use, as well as some troubleshooting info."
 echo ""
 echo "This script is based on instructions found online. If you're curious what it's doing, follow along at:" +
 echo "  https://www.digitalocean.com/community/tutorials/how-to-deploy-a-meteor-js-application-on-ubuntu-14-04-with-nginx"
@@ -52,6 +52,7 @@ chmod 0700 /etc/nginx/ssl
 echo "*** Looking for your SSL certificate and key files..."
 NOSSLPEM=0
 NOSSLKEY=0
+
 if test -f "./$METEORAPPNAME.pem"
 then
   echo "$METEORAPPNAME.pem - SSL Certificate/CA Cert File Found!"
@@ -73,9 +74,8 @@ if [ $NOSSLPEM -eq 1 ] || [ $NOSSLKEY -eq 1 ]
 then
   echo "NOTE: This script configures nginx for SSL, but does not provide the SSL certificate or key files."
   echo "      This configuration expects you to create the following two files:"
-  echo "        - Your SSL certificate and CA certificate concatenated together at /etc/nginx/ssl/$METEORAPPNAME.pem"
-  echo "        = Your SSL key at /etc/nginx/ssl/$METEORAPPNAME.key"
-  echo "      Once those two files are in place, try to restart the app." #TODO??
+  echo "        - Your SSL Cert and CA Cert concatenated together at /etc/nginx/ssl/$METEORAPPNAME.pem"
+  echo "        = Your SSL Key at /etc/nginx/ssl/$METEORAPPNAME.key"
   echo "      If you need help creating a certificate, see your CA or a guide like this for self-signed certs:"
   echo "      https://www.digitalocean.com/community/tutorials/how-to-create-a-ssl-certificate-on-nginx-for-ubuntu-12-04"
   echo ""
@@ -84,7 +84,7 @@ then
 fi
 
 echo ""
-echo "*** Preparing nginx site configuration file at $SITEAVAILABLEFILE for app named '$METEORAPPNAME'..."
+echo "*** Preparing nginx site config file at $SITEAVAILABLEFILE for app named '$METEORAPPNAME'..."
 cp -v ./nginx-site-conf $SITEAVAILABLEFILE
 sed -i "s/todos.net/$METEORSERVERNAME/g" $SITEAVAILABLEFILE
 sed -i "s/todos/$METEORAPPNAME/g" $SITEAVAILABLEFILE
@@ -97,14 +97,19 @@ testnginx () {
   echo "*** Testing nginx configuration and reloading nginx..."
   nginx -t
   nginx -s reload
+  echo "" +
+  echo "--------------------------------------------------------------------------------------------"
+  echo "   ***   Okay! At this point nginx should have told you 'test is successful' above."
+  echo "         If not, there was some problem with the nginx test, which is probably because of"
+  echo "         a problem with your SSL files. Check the files in /etc/nginx/ssl and try again."
+  echo "--------------------------------------------------------------------------------------------"
   echo ""
-  echo "Okay!  At this point nginx should be working and you should have gotten a 'test is successful' message."
-  echo "If not, and there was some problem with the nginx test, it's probably because something is wrong with your SSL files."
+  echo "FUN FACT: If this nginx test was successful, you should now be able to see a 502 Bad Gateway"
+  echo "          error at $METEORSERVERNAME! That's a good thing, we haven't yet installed the"
+  echo "          Meteor server that will sit behind this gateway."
   echo ""
-  echo "Fun fact: If this nginx test was successful, you should now be able to see a 502 Bad Gateway error at $METEORSERVERNAME!" +
-  echo "          That's a good thing, we haven't yet installed the Meteor server that will sit behind this gateway."
-  echo ""
-  confirm "The rest of this script assumes nginx is configured properly and tests successfully. Are you ready to continue now? [y/N]" || testnginx
+  echo "The rest of this script assumes nginx is configured properly and tests successfully."
+  confirm "Are you ready to continue now? [y/N]" || testnginx
 }
 testnginx
 
@@ -125,37 +130,35 @@ then
   echo "*** Configuring cron for automatic nightly mongodb backups in /var/backups/mongodb/ ..."
   echo "@daily root mkdir -p /var/backups/mongodb; mongodump --db $METEORAPPNAME --out /var/backups/mongodb/$(date +'\%Y-\%m-\%d')" > /etc/cron.d/mongodb-backup
 fi
-
 echo ""
 echo "*** Adding the PPA for newer versions of Node.js (you may be prompted to confirm)..."
 add-apt-repository ppa:chris-lea/node.js
 echo "*** Installing Node.js..."
 apt-get update
 apt-get install nodejs
-
 echo ""
-echo "*** Creating a new system user '$METEORAPPNAME' to run the app under. You'll be prompted for details, just leave them all at default."
+echo "*** Creating a new system user '$METEORAPPNAME' to run the app under."
+echo "    You'll be prompted for details, just leave them all at default."
 adduser --disabled-login $METEORAPPNAME
-
 echo ""
 echo "*** Configuring Upstart for the new '$METEORAPPNAME' service."
 cp -v ./upstart-conf $UPSTARTFILE
 sed -i "s/todos/$METEORAPPNAME/g" $UPSTARTFILE
 sed -i "s/mongourlreplaceme/$MONGOURL/g" $UPSTARTFILE
 echo ""
-echo "NOTE: If you need to use any custom meteor --settings, or an SMTP mail URL for sending email, this script doesn't support that."
-echo "      You can modify the Upstart service configuration at $UPSTARTFILE if you need stuff like this."
+echo "NOTE: If you need to use any custom meteor --settings, or an SMTP mail URL for sending email,"
+echo "      this script doesn't support that. You can modify $UPSTARTFILE if you need that stuff."
 echo ""
-echo "NOTE: Any output from the Upstart meteor service trying to start can be found in /home/$METEORAPPNAME/$METEORAPPNAME.log."
-echo "      This script does not set up any log rotation, so keep an eye on this file. If your app runs without errors, it shouldn't grow."
+echo "NOTE: Any output from the Upstart meteor service trying to start can be found in the log at:"
+echo "      /home/$METEORAPPNAME/$METEORAPPNAME.log. This script does not set up any log rotation,"
+echo "      so keep an eye on this file. If your app runs without errors, it shouldn't grow."
 echo ""
-
 echo "*** Installing g++ and make so we can build any npm dependencies your app may have..."
 apt-get install g++ make
 echo ""
-
 echo "*** Deploying your Meteor application bundle..."
 DEPLOYING=0
+
 checkforbundle () {
   echo "*** Checking for bundle file..."
   if test -f "./$METEORAPPNAME.tar.gz"
@@ -165,13 +168,16 @@ checkforbundle () {
   else
     DEPLOYING=0
     echo "No application bundle file was found at $METEORAPPNAME.tar.gz."
-    echo "Do you want to continue without deploying the application? You'll be shown how to do so in the future either way."
-    echo "If you do want to deploy the application now, create a meteor app bundle in the same directory as this script:"
+    echo "Do you want to continue without deploying the application bundle?"
+    echo "You'll be shown how to do so in the future either way."
+    echo ""
+    echo "If you do want to deploy the application now, create a meteor app bundle in the same"
+    echo "directory as this script with the file name '$METEORAPPNAME.tar.gz':"
     echo "  - On your development machine, cd to the application directory."
     echo "  - Execute 'meteor bundle $METEORAPPNAME.tar.gz'."
     echo "  - Copy the $METEORAPPNAME.tar.gz file to this server using scp and place it in this directory."
     echo ""
-    confirm "Continue without deploying? [y/N] (If you want to check again for a bundle file, type N)" || checkforbundle
+    confirm "Continue without deploying? [y/N] (To check again for a bundle file, type N)" || checkforbundle
   fi
 }
 checkforbundle
@@ -179,9 +185,12 @@ checkforbundle
 echo ""
 if [ $DEPLOYING -eq 1 ]
 then
-  source ./deploy-bundle.sh
+  ./deploy-bundle.sh
 fi
 
-echo "--- FUTURE DEPLOYMENTS ---"
+echo ""
+echo "----- FUTURE DEPLOYMENTS -----"
+echo ""
 echo "If you want to deploy your app again in the future from a new bundle file, you can easily do so."
 echo "Just upload the new bundle file to the same directory as this script, then run ./deploy-bundle.sh."
+echo ""
