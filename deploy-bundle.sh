@@ -32,7 +32,7 @@ echo ""
 restart $METEORAPPNAME
 echo ""
 echo "*** Checking that all deployed services are running..."
-status todos
+status $METEORAPPNAME
 service nginx status
 status mongodb
 echo ""
