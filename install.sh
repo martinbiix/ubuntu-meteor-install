@@ -98,7 +98,7 @@ testnginx () {
   echo "*** Testing nginx configuration and reloading nginx..."
   nginx -t
   nginx -s reload
-  echo "" +
+  echo ""
   echo "--------------------------------------------------------------------------------------------"
   echo "   ***   Okay! At this point nginx should have told you 'test is successful' above."
   echo "         If not, there was some problem with the nginx test, which is probably because of"
@@ -107,7 +107,8 @@ testnginx () {
   echo ""
   echo "FUN FACT: If this nginx test was successful, you should now be able to see a 502 Bad Gateway"
   echo "          error at $METEORSERVERNAME! That's a good thing, we haven't yet installed the"
-  echo "          Meteor server that will sit behind this gateway."
+  echo "          Meteor server that will sit behind this gateway. If you're NOT seeing that 502,"
+  echo "          make sure the $METEORSERVERNAME domain's DNS settings point to this server."
   echo ""
   echo "The rest of this script assumes nginx is configured properly and tests successfully."
   confirm "Are you ready to continue now? [y/N]" || testnginx
