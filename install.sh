@@ -33,8 +33,10 @@ echo "This script is based on instructions found online. If you're curious what 
 echo "https://www.digitalocean.com/community/tutorials/how-to-deploy-a-meteor-js-application-on-ubuntu-14-04-with-nginx"
 echo ""
 echo "NOTE: For SSL Certificate configuration, the script will look for .pem and .key files with the"
-echo "      same name as your application, and if found it will use those.  If not, you will be"
-echo "      instructed on how to set up those files."
+echo "      same name as your application in the ubuntu-meteor-install directory, and if found it"
+echo "      will use those. If not, you will be instructed on how to set up those files."
+echo "      If you have an application bundle .tar.gz file, place that in the same directory and"
+echo "      it will be unpacked and deployed for you."
 echo ""
 echo "What is the name of your application (e.g. todos): "
 read METEORAPPNAME
