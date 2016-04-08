@@ -43,10 +43,16 @@ UPSTARTFILE="/etc/init/$METEORAPPNAME.conf"
 echo "What is the server name of your application (e.g. todos.net): "
 read METEORSERVERNAME
 echo ""
+echo "*** Adding the PPA for newer versions of Node.js (you may be prompted to confirm)..."
+add-apt-repository ppa:chris-lea/node.js
 echo "*** Updating apt-get repositories..."
 apt-get update
-echo "*** Installing nginx web server..."
-apt-get install nginx
+
+clear
+echo "*** Installing nginx web server, and node.js, and g++/make for building dependencies..."
+apt-get install nginx nodejs g++ make
+
+clear
 echo "*** Creating SSL directory for nginx at /etc/nginx/ssl (chmod 0700)..."
 mkdir /etc/nginx/ssl
 chmod 0700 /etc/nginx/ssl
@@ -84,7 +90,7 @@ then
   confirm "Do you want to continue now? [y/N]" || exit 1
 fi
 
-echo ""
+clear
 echo "*** Preparing nginx site config file at $SITEAVAILABLEFILE for app named '$METEORAPPNAME'..."
 cp -v ./nginx-site-conf $SITEAVAILABLEFILE
 sed -i "s/todos.net/$METEORSERVERNAME/g" $SITEAVAILABLEFILE
@@ -115,7 +121,7 @@ testnginx () {
 }
 testnginx
 
-echo ""
+clear
 MONGOURL="mongodb://localhost:27017/$METEORAPPNAME"
 LOCALMONGO=1
 getmongourl () {
@@ -124,6 +130,7 @@ getmongourl () {
   read MONGOURL
 }
 confirm "Are you ok with using a local MongoDB database on this machine? [y/N]" || getmongourl
+
 if [ $LOCALMONGO -eq 1 ]
 then
   echo "*** Setting up a Local MongoDB Database..."
@@ -132,17 +139,13 @@ then
   echo "*** Configuring cron for automatic nightly mongodb backups in /var/backups/mongodb/ ..."
   echo "@daily root mkdir -p /var/backups/mongodb; mongodump --db $METEORAPPNAME --out /var/backups/mongodb/$(date +'\%Y-\%m-\%d')" > /etc/cron.d/mongodb-backup
 fi
-echo ""
-echo "*** Adding the PPA for newer versions of Node.js (you may be prompted to confirm)..."
-add-apt-repository ppa:chris-lea/node.js
-echo "*** Installing Node.js..."
-apt-get update
-apt-get install nodejs
-echo ""
+
+clear
 echo "*** Creating a new system user '$METEORAPPNAME' to run the app under."
 echo "    You'll be prompted for details, just leave them all at default."
 adduser --disabled-login $METEORAPPNAME
-echo ""
+
+clear
 echo "*** Configuring Upstart for the new '$METEORAPPNAME' service."
 cp -v ./upstart-conf $UPSTARTFILE
 sed -i "s/todos/$METEORAPPNAME/g" $UPSTARTFILE
@@ -154,9 +157,6 @@ echo ""
 echo "NOTE: Any output from the Upstart meteor service trying to start can be found in the log at:"
 echo "      /home/$METEORAPPNAME/$METEORAPPNAME.log. This script does not set up any log rotation,"
 echo "      so keep an eye on this file. If your app runs without errors, it shouldn't grow."
-echo ""
-echo "*** Installing g++ and make so we can build any npm dependencies your app may have..."
-apt-get install g++ make
 echo ""
 echo "*** Deploying your Meteor application bundle..."
 DEPLOYING=0
@@ -189,10 +189,3 @@ if [ $DEPLOYING -eq 1 ]
 then
   ./deploy-bundle.sh
 fi
-
-echo ""
-echo "----- FUTURE DEPLOYMENTS -----"
-echo ""
-echo "If you want to deploy your app again in the future from a new bundle file, you can easily do so."
-echo "Just upload the new bundle file to the same directory as this script, then run ./deploy-bundle.sh."
-echo ""

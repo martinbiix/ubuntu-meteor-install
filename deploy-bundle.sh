@@ -29,8 +29,9 @@ echo "*** Installing your application's npm dependencies..."
 cd /home/$METEORAPPNAME/bundle/programs/server
 npm install
 chown $METEORAPPNAME:$METEORAPPNAME /home/$METEORAPPNAME -R
-echo ""
-echo "*** OK, everything else is done, let's try and start the application... ***"
+
+clear
+echo "*** OK, everything is now installed, let's try and start the application! ***"
 echo ""
 start $METEORAPPNAME
 echo ""
@@ -43,9 +44,14 @@ echo "--------------------------------------------------------------------------
 echo "If everything worked, your app should now be serving requests at https://$METEORSERVERNAME!"
 echo "----------------------------------------------------------------------------------------------"
 echo ""
-echo "Deployment Troubleshooting:"
+echo "----- FUTURE DEPLOYMENTS -----"
+echo "If you want to deploy your app again in the future from a new bundle file, you can easily do so."
+echo "Just upload the new bundle file to the same directory as this script, then run ./deploy-bundle.sh."
+echo ""
+echo "----- TROUBLESHOOTING -----"
 echo "  - Check /home/$METEORAPPNAME/$METEORAPPNAME.log if your application starts and dies."
 echo "  - Check /var/log/nginx/error.log if you see an HTTP error instead of your application."
 echo "  - Check /var/log/mongodb/mongodb.log if you think there might a problem with the database."
 echo ""
+
 cd $CWD
