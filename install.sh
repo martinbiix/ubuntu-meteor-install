@@ -95,7 +95,6 @@ then
   confirm "Do you want to continue now? [y/N]" || exit 1
 fi
 
-clear
 echo "*** Preparing nginx site config file at $SITEAVAILABLEFILE for app named '$METEORAPPNAME'..."
 cp -v ./nginx-site-conf $SITEAVAILABLEFILE
 sed -i "s/todos.net/$METEORSERVERNAME/g" $SITEAVAILABLEFILE
