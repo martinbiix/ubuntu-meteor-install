@@ -38,6 +38,9 @@ echo "      will use those. If not, you will be instructed on how to set up thos
 echo "      If you have an application bundle .tar.gz file, place that in the same directory and"
 echo "      it will be unpacked and deployed for you."
 echo ""
+echo "NOTE: If you need to use any custom meteor --settings, or an SMTP mail URL for sending email,"
+echo "      this script doesn't support that. You can modify $UPSTARTFILE if you need that stuff."
+echo ""
 printf "What is the name of your application (e.g. todos): "
 read METEORAPPNAME
 SITEAVAILABLEFILE="/etc/nginx/sites-available/$METEORAPPNAME"
@@ -92,7 +95,6 @@ then
   confirm "Do you want to continue now? [y/N]" || exit 1
 fi
 
-clear
 echo "*** Preparing nginx site config file at $SITEAVAILABLEFILE for app named '$METEORAPPNAME'..."
 cp -v ./nginx-site-conf $SITEAVAILABLEFILE
 sed -i "s/todos.net/$METEORSERVERNAME/g" $SITEAVAILABLEFILE
@@ -142,23 +144,13 @@ then
   echo "@daily root mkdir -p /var/backups/mongodb; mongodump --db $METEORAPPNAME --out /var/backups/mongodb/$(date +'\%Y-\%m-\%d')" > /etc/cron.d/mongodb-backup
 fi
 
-clear
 echo "*** Creating a new system user '$METEORAPPNAME' to run the app under."
 echo "    You'll be prompted for details, just leave them all at default."
 adduser --disabled-login $METEORAPPNAME
-
-clear
 echo "*** Configuring Upstart for the new '$METEORAPPNAME' service."
 cp -v ./upstart-conf $UPSTARTFILE
 sed -i "s/todos/$METEORAPPNAME/g" $UPSTARTFILE
 sed -i "s/mongourlreplaceme/$MONGOURL/g" $UPSTARTFILE
-echo ""
-echo "NOTE: If you need to use any custom meteor --settings, or an SMTP mail URL for sending email,"
-echo "      this script doesn't support that. You can modify $UPSTARTFILE if you need that stuff."
-echo ""
-echo "NOTE: Any output from the Upstart meteor service trying to start can be found in the log at:"
-echo "      /home/$METEORAPPNAME/$METEORAPPNAME.log. This script does not set up any log rotation,"
-echo "      so keep an eye on this file. If your app runs without errors, it shouldn't grow."
 echo ""
 echo "*** Deploying your Meteor application bundle..."
 DEPLOYING=0
@@ -186,7 +178,7 @@ checkforbundle () {
 }
 checkforbundle
 
-echo ""
+clear
 if [ $DEPLOYING -eq 1 ]
 then
   ./deploy-bundle.sh
