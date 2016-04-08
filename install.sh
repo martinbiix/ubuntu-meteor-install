@@ -52,8 +52,6 @@ echo "*** Adding the PPA for newer versions of Node.js (you may be prompted to c
 add-apt-repository ppa:chris-lea/node.js
 echo "*** Updating apt-get repositories..."
 apt-get update
-
-clear
 echo "*** Installing nginx web server, and node.js, and g++/make for building dependencies..."
 apt-get install nginx nodejs g++ make
 
