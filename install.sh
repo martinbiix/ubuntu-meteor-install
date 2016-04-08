@@ -16,6 +16,7 @@ confirm () {
 }
 
 CWD=$(pwd)
+clear
 echo ""
 echo "----- METEOR + MONGODB + NGINX INSTALL SCRIPT -----"
 echo ""
