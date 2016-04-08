@@ -17,8 +17,10 @@ it will automagically configure SSL for you and deploy your app bundle!  If you 
 
 
 
-# QUICK START -- zero to Meteor app in just a few minutes!
+# QUICK START
+## Zero to Meteor app in just a few minutes!
 ```
+apt-get update
 apt-get install git
 git clone https://github.com/mturley/ubuntu-meteor-install.git
 cd ubuntu-meteor-install
