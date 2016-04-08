@@ -69,7 +69,7 @@ else
   NOSSLKEY=1
 fi
 
-if [ "$NOSSLPEM" == 1 ] || [ "$NOSSLKEY" == 1 ]
+if [ $NOSSLPEM -eq 1 ] || [ $NOSSLKEY -eq 1 ]
 then
   echo "NOTE: This script configures nginx for SSL, but does not provide the SSL certificate or key files."
   echo "      This configuration expects you to create the following two files:"
@@ -117,7 +117,7 @@ getmongourl () {
   read MONGOURL
 }
 confirm "Are you ok with using a local MongoDB database on this machine? [y/N]" || getmongourl
-if [ "$LOCALMONGO" == 1 ]
+if [ $LOCALMONGO -eq 1 ]
 then
   echo "*** Setting up a Local MongoDB Database..."
   apt-get install mongodb-server
@@ -177,7 +177,7 @@ checkforbundle () {
 checkforbundle
 
 echo ""
-if [ "$DEPLOYING" == 1 ]
+if [ $DEPLOYING -eq 1 ]
 then
   source ./deploy-bundle.sh
 fi
