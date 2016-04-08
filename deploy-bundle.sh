@@ -17,6 +17,9 @@ then
   read METEORSERVERNAME
 fi
 echo ""
+echo "*** Stopping your current application if it exists..."
+stop $METEORAPPNAME
+echo ""
 echo "*** Unpacking your application bundle to /hdome/$METEORAPPNAME/bundle..."
 cp -v ./$METEORAPPNAME.tar.gz /home/$METEORAPPNAME
 cd /home/$METEORAPPNAME
@@ -29,7 +32,7 @@ chown $METEORAPPNAME:$METEORAPPNAME /home/$METEORAPPNAME -R
 echo ""
 echo "*** OK, everything else is done, let's try and start the application... ***"
 echo ""
-restart $METEORAPPNAME
+start $METEORAPPNAME
 echo ""
 echo "*** Checking that all deployed services are running..."
 status $METEORAPPNAME

@@ -179,7 +179,7 @@ checkforbundle
 echo ""
 if [ $DEPLOYING -eq 1 ]
 then
-  source ./deploy-bundle.sh
+  ./deploy-bundle.sh
 fi
 
 echo "--- FUTURE DEPLOYMENTS ---"
