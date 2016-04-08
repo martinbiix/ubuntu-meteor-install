@@ -38,11 +38,11 @@ echo "      will use those. If not, you will be instructed on how to set up thos
 echo "      If you have an application bundle .tar.gz file, place that in the same directory and"
 echo "      it will be unpacked and deployed for you."
 echo ""
-echo "What is the name of your application (e.g. todos): "
+printf "What is the name of your application (e.g. todos): "
 read METEORAPPNAME
 SITEAVAILABLEFILE="/etc/nginx/sites-available/$METEORAPPNAME"
 UPSTARTFILE="/etc/init/$METEORAPPNAME.conf"
-echo "What is the server name of your application (e.g. todos.net): "
+printf "What is the server name of your application (e.g. todos.net): "
 read METEORSERVERNAME
 echo ""
 echo "*** Adding the PPA for newer versions of Node.js (you may be prompted to confirm)..."
